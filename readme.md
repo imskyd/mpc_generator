@@ -1,0 +1,1 @@
+doc: https://www.cobo.com/developers/api-references/mpc-wallet/mpc_get_supported_chains
