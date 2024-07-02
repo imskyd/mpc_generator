@@ -11,7 +11,7 @@ type MPC struct {
 	client *cobo_custody.MPCClient
 }
 
-func NewMPC(apiKey, apiSecret string) *MPC {
+func NewMPC(apiKey, apiSecret string, env cobo_custody.Env) *MPC {
 	fmt.Println("API_SECRET:", apiSecret)
 	fmt.Println("API_KEY:", apiKey)
 
@@ -21,7 +21,7 @@ func NewMPC(apiKey, apiSecret string) *MPC {
 
 	var client = cobo_custody.MPCClient{
 		Signer: localSigner,
-		Env:    cobo_custody.Dev(),
+		Env:    env,
 	}
 
 	var m MPC
