@@ -33,8 +33,24 @@ func NewMPC(apiKey, apiSecret string, env cobo_custody.Env) *MPC {
 	return &m
 }
 
+func EnvDev() cobo_custody.Env {
+	return cobo_custody.Dev()
+}
+
+func EnvProd() cobo_custody.Env {
+	return cobo_custody.Prod()
+}
+
 func (m *MPC) createRequestId() string {
 	return fmt.Sprintf("cs-go-%d", time.Now().UnixMilli())
+}
+
+func wrapCoboErr(coboErr *cobo_custody.ApiError) error {
+	if coboErr == nil {
+		return nil
+	}
+	j, _ := json.Marshal(coboErr)
+	return fmt.Errorf(string(j))
 }
 
 func (m *MPC) Transfer(coin, from, to string, amount, gasPrice, gasLimit *big.Int) (string, error) {
@@ -47,17 +63,8 @@ func (m *MPC) Transfer(coin, from, to string, amount, gasPrice, gasLimit *big.In
 	return coboId, nil
 }
 
-func wrapCoboErr(coboErr *cobo_custody.ApiError) error {
-	if coboErr == nil {
-		return nil
-	}
-	j, _ := json.Marshal(coboErr)
-	return fmt.Errorf(string(j))
-}
-
 func (m *MPC) Approve(coin, from, token, spender string, approveAmount, gasPrice, gasLimit *big.Int) (string, error) {
-	abiString := "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"spender\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"approve\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
-	abiReader, _ := abi.JSON(strings.NewReader(abiString))
+	abiReader, _ := abi.JSON(strings.NewReader(ApproveABI))
 	approvePack, packErr := abiReader.Pack("approve", common.HexToAddress(spender), approveAmount)
 	if packErr != nil {
 		return "", packErr
@@ -93,6 +100,21 @@ func (m *MPC) GetTransactionByRequestIds(requestIds string) ([]Transaction, erro
 
 func (m *MPC) GetTransactionByCoboIds(coboIds string) ([]Transaction, error) {
 	res, err := m.client.TransactionsByCoboIds(coboIds, 0)
+	if err != nil {
+		return nil, fmt.Errorf(err.ErrorMessage)
+	}
+	txJson, err2 := res.Get("transactions").MarshalJSON()
+	if err != nil {
+		return nil, err2
+	}
+	var transactions []Transaction
+	_ = json.Unmarshal(txJson, &transactions)
+	return transactions, err2
+}
+
+func (m *MPC) GetTransactionsListByAddress(address string) ([]Transaction, error) {
+	res, err := m.client.ListTransactions(0, 0, 0, "", "", 0,
+		"", address, "", 0)
 	if err != nil {
 		return nil, fmt.Errorf(err.ErrorMessage)
 	}
