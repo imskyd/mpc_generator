@@ -131,7 +131,7 @@ func (m *MPC) CreateTaskContractCall(coin, from, to, callData string, amount, ga
 		to:        to,
 		operation: OperationContractCall,
 		callData:  extraParameters,
-		amount:    big.NewInt(0),
+		amount:    amount,
 		gasPrice:  gasPrice,
 		gasLimit:  gasLimit,
 	}
