@@ -24,40 +24,38 @@ type Task struct {
 }
 
 func (m *MPC) RunTaskFlow(tasks []*Task) {
-	for true {
-		for _, task := range tasks {
-			for true {
-				txs, err := m.GetTransactionsListByAddress(task.from)
-				if err != nil {
-					log.Printf("m.GetTransactionsListByAddress(%s) err: %s", task.from, err.Error())
-					return
-				}
+	for _, task := range tasks {
+		for true {
+			txs, err := m.GetTransactionsListByAddress(task.from)
+			if err != nil {
+				log.Printf("m.GetTransactionsListByAddress(%s) err: %s", task.from, err.Error())
+				return
+			}
 
-				var coboExecuted bool
-				for _, tx := range txs {
-					if tx.Remark == task.TaskId {
-						coboExecuted = true
-						//if tx success
-						if tx.Status == TxStatusSuccess {
-							break
-						}
-						if tx.Status == TxStatusFailed {
-							log.Printf("tx failed cobo id: %s", tx.CoboId)
-							return
-						}
+			var coboExecuted bool
+			for _, tx := range txs {
+				if tx.Remark == task.TaskId {
+					coboExecuted = true
+					//if tx success
+					if tx.Status == TxStatusSuccess {
+						break
 					}
-				}
-				if !coboExecuted {
-					//create tx
-					_, err := m.RunTask(task)
-					if err != nil {
-						j, _ := json.Marshal(task)
-						log.Printf("run task err: %s, task: %s", err.Error(), string(j))
+					if tx.Status == TxStatusFailed {
+						log.Printf("tx failed cobo id: %s", tx.CoboId)
 						return
 					}
 				}
-				time.Sleep(time.Second * 5)
 			}
+			if !coboExecuted {
+				//create tx
+				_, err := m.RunTask(task)
+				if err != nil {
+					j, _ := json.Marshal(task)
+					log.Printf("run task err: %s, task: %s", err.Error(), string(j))
+					return
+				}
+			}
+			time.Sleep(time.Second * 5)
 		}
 	}
 }
