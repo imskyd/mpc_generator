@@ -84,6 +84,27 @@ func (m *MPC) ContractCall(coin, from, to, callData string, amount, gasPrice, ga
 	return coboId, nil
 }
 
+func (m *MPC) Approve1559(coin, from, token, spender string, approveAmount, maxFee, maxPriorityFee, gasLimit *big.Int) (string, error) {
+	abiReader, _ := abi.JSON(strings.NewReader(ApproveABI))
+	approvePack, packErr := abiReader.Pack("approve", common.HexToAddress(spender), approveAmount)
+	if packErr != nil {
+		return "", packErr
+	}
+	res, err := m.ContractCall1559(coin, from, token, fmt.Sprintf("0x%s", common.Bytes2Hex(approvePack)), big.NewInt(0), maxFee, maxPriorityFee, gasLimit)
+	return res, err
+}
+
+func (m *MPC) ContractCall1559(coin, from, to, callData string, amount, maxFee, maxPriorityFee, gasLimit *big.Int) (string, error) {
+	requestId := m.createRequestId()
+	extraParameters := fmt.Sprintf("{\"calldata\": \"%s\"}", callData)
+	res, err := m.client.CreateTransaction(coin, requestId, amount, from, to, "", nil, nil, gasLimit, OperationContractCall, extraParameters, maxFee, maxPriorityFee, nil, "")
+	if err != nil {
+		return "", wrapCoboErr(err)
+	}
+	coboId, _ := res.Get("cobo_id").String()
+	return coboId, nil
+}
+
 func (m *MPC) GetTransactionByRequestIds(requestIds string) ([]Transaction, error) {
 	res, err := m.client.TransactionsByRequestIds(requestIds, 0)
 	if err != nil {
