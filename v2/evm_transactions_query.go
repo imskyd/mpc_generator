@@ -7,8 +7,12 @@ import (
 	"time"
 )
 
-func (m *EvmMpcV2) WaitTransactionDone(transactionId string) error {
+func (m *EvmMpcV2) WaitTransactionDone(transactionId string, maxTryTime int) error {
+	tryTime := 1
 	for {
+		if tryTime > maxTryTime {
+			return fmt.Errorf("wait transaction get max try times")
+		}
 		resp, err := m.GetTransactionByTransactionId(transactionId)
 		if err != nil {
 			return err
@@ -28,6 +32,7 @@ func (m *EvmMpcV2) WaitTransactionDone(transactionId string) error {
 		}
 
 		time.Sleep(3 * time.Second)
+		tryTime++
 	}
 }
 
