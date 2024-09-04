@@ -23,6 +23,7 @@ func (m *EvmMpcV2) WaitTransactionDone(transactionId string) error {
 		case coboWaas2.TRANSACTIONSTATUS_FAILED:
 			return fmt.Errorf("transaction failed: tx id: %s", transactionId)
 		default:
+			//continue when got other status
 			log.Printf("transaction id: %s status: %s", transactionId, resp.Status)
 		}
 
