@@ -14,16 +14,6 @@ import (
 	"time"
 )
 
-var logger *logrus.Logger
-
-func init() {
-	logger = logrus.New()
-	logger.SetFormatter(&logrus.TextFormatter{
-		FullTimestamp:   true,
-		TimestampFormat: time.StampMilli,
-	})
-}
-
 type EvmMpcV2 struct {
 	privateKey string
 	client     *coboWaas2.APIClient
@@ -52,7 +42,7 @@ func NewEvmMpcV2(env int, privateKey, walletId string) *EvmMpcV2 {
 	mpc.walletId = walletId
 	mpc.env = env
 
-	logger = logrus.New()
+	logger := logrus.New()
 	logger.SetFormatter(&logrus.TextFormatter{
 		FullTimestamp:   true,
 		TimestampFormat: time.StampMilli,
