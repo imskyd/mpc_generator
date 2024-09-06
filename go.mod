@@ -4,11 +4,12 @@ go 1.22.1
 
 require (
 	github.com/CoboGlobal/cobo-go-api v0.46.0
+	github.com/CoboGlobal/cobo-waas2-go-sdk v1.2.0
 	github.com/ethereum/go-ethereum v1.14.6
+	github.com/sirupsen/logrus v1.9.3
 )
 
 require (
-	github.com/CoboGlobal/cobo-waas2-go-sdk v1.2.0 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/StackExchange/wmi v1.2.1 // indirect
 	github.com/bitly/go-simplejson v0.5.0 // indirect
