@@ -69,6 +69,10 @@ func (m *EvmMpcV2) SetDebug(status bool) {
 	m.debug = status
 }
 
+func (m *EvmMpcV2) WalletId() string {
+	return m.walletId
+}
+
 func (m *EvmMpcV2) getCtx() context.Context {
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, coboWaas2.ContextEnv, m.env)
