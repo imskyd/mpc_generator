@@ -96,6 +96,19 @@ func (m *EvmMpcV2) formatResponse(resp *coboWaas2.CreateTransferTransaction201Re
 	return nil, fmt.Errorf("err: %s, body: %s", err.Error(), string(body))
 }
 
+func (m *EvmMpcV2) formatResponseCommon(resp *http.Response, err error) (*http.Response, error) {
+	if err == nil {
+		return resp, nil
+	}
+	defer resp.Body.Close()
+
+	body, readErr := io.ReadAll(resp.Body)
+	if readErr != nil {
+		return nil, fmt.Errorf("err: %s, unable to read response body: %s", err.Error(), readErr)
+	}
+	return nil, fmt.Errorf("err: %s, body: %s", err.Error(), string(body))
+}
+
 func (m *EvmMpcV2) EstimateGas(from, to, data, value, gasPrice, maxFee, priorityGas string) (uint64, error) {
 	fromAddr := common.HexToAddress(from)
 	toAddr := common.HexToAddress(to)
