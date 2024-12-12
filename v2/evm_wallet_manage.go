@@ -10,3 +10,9 @@ func (m *EvmMpcV2) WalletCreateAddress(walletId, chainId string, walletNum int32
 	_, errResp := m.formatResponseCommon(resp, err)
 	return addresses, errResp
 }
+
+func (m *EvmMpcV2) ListTokenBalancesForAddress(walletId, address string) (*coboWaas2.ListTokenBalancesForAddress200Response, error) {
+	apiResp, resp, err := m.client.WalletsAPI.ListTokenBalancesForAddress(m.getCtx(), walletId, address).Execute()
+	_, errResp := m.formatResponseCommon(resp, err)
+	return apiResp, errResp
+}
